@@ -4,7 +4,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.sablengauto.showroomapi.entity.Car;
-import com.sablengauto.showroomapi.repository.CarRepository;
 import com.sablengauto.showroomapi.service.CarService;
 
 import com.sablengauto.showroomapi.dto.CarRequest;

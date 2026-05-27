@@ -9,15 +9,15 @@ import lombok.Setter;
 @Setter
 public class CarRequest {
 
-    @NotBlank(message = "Brand is required")
+    @NotBlank(message = "Brand Mobil gak boleh kosong")
     private String brand;
 
-    @NotBlank(message = "Model is required")
+    @NotBlank(message = "Model Mobil gak boleh kosong")
     private String model;
     
-    @Min(value = 2000, message = "Year must be above 2000")
+    @Min(value = 2000, message = "Tahun Mobil harus 2000 atau lebih")
     private int year;
     
-    @Min(value = 0, message = "Price must be a positive value")
+    @Min(value = 0, message = "Harga harus bernilai positif")
     private double price;
 }

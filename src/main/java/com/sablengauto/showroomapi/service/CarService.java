@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import com.sablengauto.showroomapi.entity.Car;
 import com.sablengauto.showroomapi.repository.CarRepository;
 import com.sablengauto.showroomapi.dto.CarRequest;
+import com.sablengauto.showroomapi.exception.ResourceNotFoundException;
 
 @Service
 public class CarService {
@@ -35,7 +36,7 @@ public class CarService {
     public Car updateCar(Long id, CarRequest request) {
 
         Car car = carRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Car not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Mobil gak ditemukan"));
 
         car.setBrand(request.getBrand());
         car.setModel(request.getModel());
@@ -46,6 +47,9 @@ public class CarService {
     }
 
     public void deleteCar(Long id) {
+        Car car = carRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Mobil gak ditemukan"));
         carRepository.deleteById(id);
     }
 }
