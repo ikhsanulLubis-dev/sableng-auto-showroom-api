@@ -12,6 +12,8 @@ import com.sablengauto.showroomapi.enums.CarStatus;
 import com.sablengauto.showroomapi.repository.CarRepository;
 import com.sablengauto.showroomapi.dto.CarRequest;
 import com.sablengauto.showroomapi.exception.ResourceNotFoundException;
+import org.springframework.data.jpa.domain.Specification;
+import com.sablengauto.showroomapi.specification.CarSpecification;
 
 @Service
 public class CarService {
@@ -25,6 +27,31 @@ public class CarService {
     // public List<Car> getAllCars() {
     // return carRepository.findAll();
     // }
+
+    public Page<Car> filterCars(
+            String brand,
+            CarStatus status,
+            Integer year,
+            Double minPrice,
+            Double maxPrice,
+            Integer startYear,
+            Integer endYear,
+            Pageable pageable) {
+
+        Specification<Car> specification = CarSpecification.filterCars(
+                brand,
+                status,
+                year,
+                minPrice,
+                maxPrice,
+                startYear,
+                endYear);
+
+        return carRepository.findAll(
+                specification,
+                pageable);
+
+    }
 
     public Page<Car> getAllCars(Pageable pageable) {
 
@@ -80,7 +107,10 @@ public class CarService {
         Car car = carRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Mobil gak ditemukan"));
 
-        if (request.getStatus() == CarStatus.SOLD_OUT) {
+        Car existingCar = carRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Mobil gak ditemukan"));
+
+        if (existingCar.getStatus() == CarStatus.SOLD_OUT) {
             throw new BadRequestException("Status  SOLD_OUT tidak bisa di update");
         } else {
             car.setBrand(request.getBrand());

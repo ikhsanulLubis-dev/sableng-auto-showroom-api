@@ -6,17 +6,19 @@ import com.sablengauto.showroomapi.enums.CarStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
-public interface CarRepository extends JpaRepository<Car, Long> {
-    Page<Car> findByBrandContainingIgnoreCase(
-            String brand,
-            Pageable pageable);
+public interface CarRepository extends JpaRepository<Car, Long>,
+                JpaSpecificationExecutor<Car> {
+        Page<Car> findByBrandContainingIgnoreCase(
+                        String brand,
+                        Pageable pageable);
 
-    Page<Car> findByStatus(
-            CarStatus status,
-            Pageable pageable);
+        Page<Car> findByStatus(
+                        CarStatus status,
+                        Pageable pageable);
 
-    Page<Car> findByYear(
-            Integer year,
-            Pageable pageable);
+        Page<Car> findByYear(
+                        Integer year,
+                        Pageable pageable);
 }

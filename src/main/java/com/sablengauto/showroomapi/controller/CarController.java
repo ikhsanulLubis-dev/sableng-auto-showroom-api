@@ -13,8 +13,6 @@ import com.sablengauto.showroomapi.service.CarService;
 import com.sablengauto.showroomapi.dto.CarRequest;
 import jakarta.validation.Valid;
 
-import java.util.List;
-
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -58,46 +56,99 @@ public class CarController {
 
     // }
 
+    // @GetMapping
+    // public Page<Car> getAllCars(
+    // @RequestParam(required = false) String brand,
+    // @RequestParam(required = false) CarStatus status,
+    // @RequestParam(required = false) Integer year,
+    // Pageable pageable) {
+
+    // log.info("GET cars request received");
+
+    // if (brand != null) {
+    // log.info("GET cars by brand request received with brand: {} and pagination:
+    // {}", brand, pageable);
+    // appLoggerService.log("GET", "/api/cars?brand=" + brand + "&page=" +
+    // pageable.getPageNumber() + "&size="
+    // + pageable.getPageSize() + "&sort=" + pageable.getSort() + "&unpaged=" +
+    // pageable.isUnpaged()
+    // + "&paged=" + pageable.isPaged(),
+    // "GET cars by brand request received with brand: " + brand + " and pagination:
+    // " + pageable);
+    // return carService
+    // .searchCars(brand, pageable);
+
+    // }
+    // if (status != null) {
+    // log.info("GET cars by status request received with status: {} and pagination:
+    // {}", status, pageable);
+    // appLoggerService.log("GET", "/api/cars?status=" + status + "&page=" +
+    // pageable.getPageNumber() + "&size="
+    // + pageable.getPageSize() + "&sort=" + pageable.getSort() + "&unpaged=" +
+    // pageable.isUnpaged()
+    // + "&paged=" + pageable.isPaged(),
+    // "GET cars by status request received with status: " + status + " and
+    // pagination: " + pageable);
+    // return carService
+    // .getCarsByStatus(status, pageable);
+    // }
+    // if (year != null) {
+    // log.info("GET cars by year request received with year: {} and pagination:
+    // {}", year, pageable);
+
+    // return carService
+    // .getCarsByYear(year, pageable);
+    // }
+    // log.info("GET all cars request received");
+    // appLoggerService.log("GET", "/api/cars", "GET all cars request received");
+    // return carService.getAllCars(pageable);
+
+    // }
+
     @GetMapping
     public Page<Car> getAllCars(
+
             @RequestParam(required = false) String brand,
+
             @RequestParam(required = false) CarStatus status,
+
             @RequestParam(required = false) Integer year,
+
+            @RequestParam(required = false) Double minPrice,
+
+            @RequestParam(required = false) Double maxPrice,
+
+            @RequestParam(required = false) Integer startYear,
+
+            @RequestParam(required = false) Integer endYear,
+
             Pageable pageable) {
 
-        log.info("GET cars request received");
+        log.info(
+                "GET cars request received - brand: {}, status: {}, year: {}",
+                brand,
+                status,
+                year);
+        appLoggerService.log("GET",
+                "/api/cars?brand=" + brand + "&status=" + status + "&year=" + year + "&minPrice=" + minPrice
+                        + "&maxPrice=" + maxPrice + "&startYear=" + startYear + "&endYear=" + endYear + "&page="
+                        + pageable.getPageNumber()
+                        + "&size=" + pageable.getPageSize() + "&sort=" + pageable.getSort() + "&unpaged="
+                        + pageable.isUnpaged() + "&paged=" + pageable.isPaged(),
+                "GET cars request received - brand: " + brand + ", status: " + status + ", year: " + year
+                        + ",minPrice: "
+                        + minPrice + ", maxPrice: " + maxPrice + ", startYear: " + startYear + ", endYear: " + endYear
+                        + " and pagination: " + pageable);
 
-        if (brand != null) {
-            log.info("GET cars by brand request received with brand: {} and pagination: {}", brand, pageable);
-            appLoggerService.log("GET", "/api/cars?brand=" + brand + "&page=" + pageable.getPageNumber() + "&size="
-                    + pageable.getPageSize() + "&sort=" + pageable.getSort() + "&unpaged=" + pageable.isUnpaged()
-                    + "&paged=" + pageable.isPaged(),
-                    "GET cars by brand request received with brand: " + brand + " and pagination: " + pageable);
-            return carService
-                    .searchCars(brand, pageable);
-
-        }
-        if (status != null) {
-            log.info("GET cars by status request received with status: {} and pagination: {}", status, pageable);
-            appLoggerService.log("GET", "/api/cars?status=" + status + "&page=" + pageable.getPageNumber() + "&size="
-                    + pageable.getPageSize() + "&sort=" + pageable.getSort() + "&unpaged=" + pageable.isUnpaged()
-                    + "&paged=" + pageable.isPaged(),
-                    "GET cars by status request received with status: " + status + " and pagination: " + pageable);
-            return carService
-                    .getCarsByStatus(status, pageable);
-        }
-        if (year != null) {
-            log.info("GET cars by year request received with year: {} and pagination: {}", year, pageable);
-            appLoggerService.log("GET", "/api/cars?year=" + year + "&page=" + pageable.getPageNumber() + "&size="
-                    + pageable.getPageSize() + "&sort=" + pageable.getSort() + "&unpaged=" + pageable.isUnpaged()
-                    + "&paged=" + pageable.isPaged(),
-                    "GET cars by year request received with year: " + year + " and pagination: " + pageable);
-            return carService
-                    .getCarsByYear(year, pageable);
-        }
-        log.info("GET all cars request received");
-        appLoggerService.log("GET", "/api/cars", "GET all cars request received");
-        return carService.getAllCars(pageable);
+        return carService.filterCars(
+                brand,
+                status,
+                year,
+                minPrice,
+                maxPrice,
+                startYear,
+                endYear,
+                pageable);
 
     }
 
@@ -110,7 +161,11 @@ public class CarController {
     @PutMapping("/{id}")
     public Car updateCar(@PathVariable Long id,
             @RequestBody @Valid CarRequest request) throws BadRequestException {
-        appLoggerService.log("PUT", "/api/cars/" + id, "UPDATE car request received");
+        appLoggerService.log("PUT", "/api/cars/" + id,
+                "UPDATE car request received" + " with id: " + id + " and request body: brand :" + request.getBrand()
+                        + ", model:" + request.getModel() + ", year:" + request.getYear() + ", price:"
+                        + request.getPrice() + ", status:" + request.getStatus());
+
         return carService.updateCar(id, request);
     }
 
