@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -17,92 +18,100 @@ import com.sablengauto.showroomapi.repository.CarRepository;
 
 @Service
 public class CarImageService {
-    private final CarRepository carRepository;
-    private final CarImageRepository carImageRepository;
-    private final AppLoggerService appLoggerService;
+        private final CarRepository carRepository;
+        private final CarImageRepository carImageRepository;
+        private final AppLoggerService appLoggerService;
 
-    private final String uploadDir = "uploads/";
+        private final String uploadDir = "uploads/";
 
-    public CarImageService(
-            CarRepository carRepository,
-            CarImageRepository carImageRepository,
-            AppLoggerService appLoggerService) {
+        public CarImageService(
+                        CarRepository carRepository,
+                        CarImageRepository carImageRepository,
+                        AppLoggerService appLoggerService) {
 
-        this.carRepository = carRepository;
-        this.carImageRepository = carImageRepository;
-        this.appLoggerService = appLoggerService;
-
-    }
-
-    public void uploadCarImage(
-            Long carId,
-            MultipartFile file,
-            String uploadedBy)
-            throws IOException {
-
-        Car car = carRepository.findById(carId)
-                .orElseThrow(() -> new BadRequestException(
-                        "Mobil tidak ditemukan"));
-
-        if (file.isEmpty()) {
-
-            throw new BadRequestException(
-                    "File tidak boleh kosong");
+                this.carRepository = carRepository;
+                this.carImageRepository = carImageRepository;
+                this.appLoggerService = appLoggerService;
 
         }
 
-        if (!file.getContentType()
-                .startsWith("image/")) {
+        public List<CarImage> getImagesByCarId(
+                        Long carId) {
 
-            throw new BadRequestException(
-                    "File harus berupa gambar");
-
-        }
-
-        long maxSize = 1024 * 1024;
-
-        if (file.getSize() > maxSize) {
-
-            throw new BadRequestException(
-                    "Ukuran file maksimal 1MB");
+                return carImageRepository
+                                .findByCarId(carId);
 
         }
 
-        String fileName = System.currentTimeMillis()
-                + "_"
-                + file.getOriginalFilename();
+        public void uploadCarImage(
+                        Long carId,
+                        MultipartFile file,
+                        String uploadedBy)
+                        throws IOException {
 
-        Path path = Paths.get(
-                uploadDir + fileName);
+                Car car = carRepository.findById(carId)
+                                .orElseThrow(() -> new BadRequestException(
+                                                "Mobil tidak ditemukan"));
 
-        Files.copy(
-                file.getInputStream(),
-                path);
+                if (file.isEmpty()) {
 
-        CarImage carImage = new CarImage();
+                        throw new BadRequestException(
+                                        "File tidak boleh kosong");
 
-        carImage.setFileName(fileName);
+                }
 
-        carImage.setFilePath(
-                path.toString());
+                if (!file.getContentType()
+                                .startsWith("image/")) {
 
-        carImage.setFileSize(
-                file.getSize());
+                        throw new BadRequestException(
+                                        "File harus berupa gambar");
 
-        carImage.setUploadedBy(
-                uploadedBy);
+                }
 
-        carImage.setUploadedAt(
-                LocalDateTime.now());
+                long maxSize = 1024 * 1024;
 
-        carImage.setCar(car);
+                if (file.getSize() > maxSize) {
 
-        carImageRepository.save(carImage);
+                        throw new BadRequestException(
+                                        "Ukuran file maksimal 1MB");
 
-        appLoggerService.log(
-                "UPLOAD",
-                "/api/cars/" + carId + "/images",
-                "Image uploaded: " + fileName);
+                }
 
-    }
+                String fileName = System.currentTimeMillis()
+                                + "_"
+                                + file.getOriginalFilename();
+
+                Path path = Paths.get(
+                                uploadDir + fileName);
+
+                Files.copy(
+                                file.getInputStream(),
+                                path);
+
+                CarImage carImage = new CarImage();
+
+                carImage.setFileName(fileName);
+
+                carImage.setFilePath(
+                                path.toString());
+
+                carImage.setFileSize(
+                                file.getSize());
+
+                carImage.setUploadedBy(
+                                uploadedBy);
+
+                carImage.setUploadedAt(
+                                LocalDateTime.now());
+
+                carImage.setCar(car);
+
+                carImageRepository.save(carImage);
+
+                appLoggerService.log(
+                                "UPLOAD",
+                                "/api/cars/" + carId + "/images",
+                                "Image uploaded: " + fileName);
+
+        }
 }

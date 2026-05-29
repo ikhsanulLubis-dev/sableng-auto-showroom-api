@@ -24,6 +24,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.data.domain.Sort;
+import io.swagger.v3.oas.annotations.Parameter;
+
 
 @RestController
 @RequestMapping("/api/cars")
@@ -39,71 +43,6 @@ public class CarController {
         this.carService = carService;
         this.appLogRepository = appLogRepository;
     }
-
-    // @GetMapping
-    // public List<Car> getAllCars() {
-    // // log.info("GET all cars request received");
-    // appLoggerService.log("GET", "/api/cars", "GET all cars request received");
-    // return carService.getAllCars();
-    // }
-
-    // @GetMapping
-    // public Page<Car> getAllCars(Pageable pageable) {
-
-    // log.info("GET all cars request received");
-    // appLoggerService.log("GET", "/api/cars", "GET all cars request received");
-    // return carService.getAllCars(pageable);
-
-    // }
-
-    // @GetMapping
-    // public Page<Car> getAllCars(
-    // @RequestParam(required = false) String brand,
-    // @RequestParam(required = false) CarStatus status,
-    // @RequestParam(required = false) Integer year,
-    // Pageable pageable) {
-
-    // log.info("GET cars request received");
-
-    // if (brand != null) {
-    // log.info("GET cars by brand request received with brand: {} and pagination:
-    // {}", brand, pageable);
-    // appLoggerService.log("GET", "/api/cars?brand=" + brand + "&page=" +
-    // pageable.getPageNumber() + "&size="
-    // + pageable.getPageSize() + "&sort=" + pageable.getSort() + "&unpaged=" +
-    // pageable.isUnpaged()
-    // + "&paged=" + pageable.isPaged(),
-    // "GET cars by brand request received with brand: " + brand + " and pagination:
-    // " + pageable);
-    // return carService
-    // .searchCars(brand, pageable);
-
-    // }
-    // if (status != null) {
-    // log.info("GET cars by status request received with status: {} and pagination:
-    // {}", status, pageable);
-    // appLoggerService.log("GET", "/api/cars?status=" + status + "&page=" +
-    // pageable.getPageNumber() + "&size="
-    // + pageable.getPageSize() + "&sort=" + pageable.getSort() + "&unpaged=" +
-    // pageable.isUnpaged()
-    // + "&paged=" + pageable.isPaged(),
-    // "GET cars by status request received with status: " + status + " and
-    // pagination: " + pageable);
-    // return carService
-    // .getCarsByStatus(status, pageable);
-    // }
-    // if (year != null) {
-    // log.info("GET cars by year request received with year: {} and pagination:
-    // {}", year, pageable);
-
-    // return carService
-    // .getCarsByYear(year, pageable);
-    // }
-    // log.info("GET all cars request received");
-    // appLoggerService.log("GET", "/api/cars", "GET all cars request received");
-    // return carService.getAllCars(pageable);
-
-    // }
 
     @GetMapping
     public Page<Car> getAllCars(
@@ -122,7 +61,7 @@ public class CarController {
 
             @RequestParam(required = false) Integer endYear,
 
-            Pageable pageable) {
+            @PageableDefault(sort = "id", direction = Sort.Direction.ASC) @Parameter(hidden = true) Pageable pageable) {
 
         log.info(
                 "GET cars request received - brand: {}, status: {}, year: {}",
